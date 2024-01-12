@@ -1,0 +1,16 @@
+version: "3"
+services:
+  backend:
+    build:
+      context: ./packages/backend
+      dockerfile: Dockerfile
+      args:
+        - PORT=${PORT}
+    image: mern-blog-backend
+    restart: always
+    ports:
+      - ${PORT}:${PORT}
+    volumes:
+      - ./packages/backend:/usr/local/app/packages/backend
+    env_file:
+      - .env
