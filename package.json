@@ -1,7 +1,14 @@
 {
   "scripts": {
+    "dev:backend": "cd packages/backend && npm run dev",
+    "dev:frontend": "cd packages/frontend && npm run dev",
+    "dev": "concurrently npm:dev:*",
     "build:backend": "cd packages/backend && npm run build",
-    "build": "concurrently npm:build:*"
+    "build:frontend": "cd packages/frontend && npm run build",
+    "build": "concurrently npm:build:*",
+    "start:backend": "cd packages/backend && npm run start",
+    "start:frontend": "cd packages/frontend && npm run start",
+    "start": "concurrently npm:start:*"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
