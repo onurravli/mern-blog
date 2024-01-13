@@ -15,12 +15,24 @@ services:
       context: ./packages/backend
       dockerfile: Dockerfile
       args:
-        - PORT=${PORT}
+        - PORT=3001
     image: mern-blog-backend
     restart: always
     ports:
-      - ${PORT}:${PORT}
+      - 3001:3001
     volumes:
       - ./packages/backend:/usr/local/app/packages/backend
     env_file:
       - .env
+  frontend:
+    build:
+      context: ./packages/frontend
+      dockerfile: Dockerfile
+      args:
+        - PORT=3000
+    image: mern-blog-frontend
+    restart: always
+    ports:
+      - 3000:3000
+    volumes:
+      - ./packages/frontend:/usr/local/app/packages/frontend
