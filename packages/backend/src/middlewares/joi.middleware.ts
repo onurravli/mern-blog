@@ -1,4 +1,4 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import DateExtension from "@joi/date";
 import JoiImport from "joi";
 
@@ -6,7 +6,7 @@ const joiImport = JoiImport.extend(DateExtension) as typeof JoiImport;
 
 const schemes = {
   params: joiImport.object({
-    id: joiImport.number().positive().required(),
+    id: joiImport.string().length(24).required(),
   }),
   body: joiImport.object({
     title: JoiImport.string().required().max(50),
@@ -31,7 +31,6 @@ const joi = (req: Request, res: Response, next: NextFunction) => {
         });
       }
       break;
-
     case "PUT":
     case "POST":
       var { error } = schemes.body.validate(req.body);
