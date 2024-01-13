@@ -8,24 +8,33 @@ class PostsController {
   public async get(req: Request, res: Response) {
     const { id } = req.params;
     if (id) {
-      const post = ((await mongodb.default.getFromDb(new ObjectId(id as string))) as Result).data as Post[];
-      if (post.length != 0) {
-        return res.status(200).json(post[0]);
+      const resp = await mongodb.default.getFromDb(new ObjectId(id as string));
+      if (resp.success) {
+        const post = resp.data as unknown as Post[];
+        if (post.length != 0) {
+          return res.status(200).json(post[0]);
+        }
+        return res.status(404).json({
+          error: "Post not found.",
+        });
       }
-      return res.status(404).json({
-        error: "Post not found.",
+    }
+    const resp = await mongodb.default.getFromDb();
+    if (resp.success) {
+      const posts = resp.data as unknown as Post[];
+      return res.status(200).json({
+        count: posts.length,
+        posts: posts,
       });
     }
-    const posts = ((await mongodb.default.getFromDb()) as Result).data as Post[];
-    return res.status(200).json({
-      count: posts.length,
-      posts: posts,
+    return res.status(resp.error.code).json({
+      error: resp.error.message,
     });
   }
 
   public async post(req: Request, res: Response) {
     const post: Post = req.body;
-    const resp = await mongodb.default.pushToDb(post);
+    const resp = await mongodb.default.postToDb(post);
     if (resp.success) {
       return res.status(201).json({
         message: "Post created successfully.",
@@ -39,9 +48,15 @@ class PostsController {
 
   public async put(req: Request, res: Response) {
     const post: Post = req.body;
-    return res.status(200).json({
-      message: "PUT /posts/:id",
-      post: post,
+    const { id } = req.params;
+    const resp = await mongodb.default.updateFromDb(new ObjectId(id), post);
+    if (resp.success) {
+      return res.status(200).json({
+        message: "Post updated successfully.",
+      });
+    }
+    return res.status(resp.error.code).json({
+      error: resp.error.message,
     });
   }
 
