@@ -8,7 +8,7 @@ class PostsController {
   public async get(req: Request, res: Response) {
     const { id } = req.params;
     if (id) {
-      const resp = await mongodb.default.getFromDb(new ObjectId(id as string));
+      const resp = await mongodb.getFromDb(new ObjectId(id as string));
       if (resp.success) {
         const post = resp.data as unknown as Post[];
         if (post.length != 0) {
@@ -19,7 +19,7 @@ class PostsController {
         });
       }
     }
-    const resp = await mongodb.default.getFromDb();
+    const resp = await mongodb.getFromDb();
     if (resp.success) {
       const posts = resp.data as unknown as Post[];
       return res.status(200).json({
@@ -34,7 +34,7 @@ class PostsController {
 
   public async post(req: Request, res: Response) {
     const post: Post = req.body;
-    const resp = await mongodb.default.postToDb(post);
+    const resp = await mongodb.postToDb(post);
     if (resp.success) {
       return res.status(201).json({
         message: "Post created successfully.",
@@ -49,7 +49,7 @@ class PostsController {
   public async put(req: Request, res: Response) {
     const post: Post = req.body;
     const { id } = req.params;
-    const resp = await mongodb.default.updateFromDb(new ObjectId(id), post);
+    const resp = await mongodb.updateFromDb(new ObjectId(id), post);
     if (resp.success) {
       return res.status(200).json({
         message: "Post updated successfully.",
@@ -62,7 +62,7 @@ class PostsController {
 
   public async delete(req: Request, res: Response) {
     const { id } = req.params;
-    const resp: Result = await mongodb.default.deleteFromDb(new ObjectId(id));
+    const resp: Result = await mongodb.deleteFromDb(new ObjectId(id));
     if (resp.success) {
       return res.status(200).json({
         message: "Post deleted successfully.",
