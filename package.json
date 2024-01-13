@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "build:backend": "cd packages/backend && npm run build",
+    "build": "concurrently npm:build:*"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
