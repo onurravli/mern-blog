@@ -158,9 +158,4 @@ const updateFromDb = async (id: ObjectId, post: Post) => {
   }
 };
 
-export default {
-  postToDb,
-  getFromDb,
-  deleteFromDb,
-  updateFromDb,
-};
+export { postToDb, getFromDb, deleteFromDb, updateFromDb };
