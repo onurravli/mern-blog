@@ -1,5 +1,15 @@
 version: "3"
 services:
+  mongo:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+
   backend:
     build:
       context: ./packages/backend
