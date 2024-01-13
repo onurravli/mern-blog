@@ -1,7 +1,7 @@
 import { Collection, Db, MongoClient, ObjectId } from "mongodb";
 import dotenv from "dotenv";
 import { Post } from "../models";
-import { Result } from "../interfaces";
+import moment from "moment";
 
 dotenv.config();
 
@@ -21,19 +21,31 @@ const postsCollection: Collection = db.collection("posts");
 
 collections.posts = postsCollection;
 
-const pushToDb = async (post: Post) => {
+const postToDb = async (post: Post) => {
   try {
     await client.connect();
-    await collections.posts?.insertOne(post);
+    await collections.posts?.insertOne({
+      title: post.title,
+      content: post.content,
+      author: post.author,
+      created_on: moment(new Date(Date.now()), ["DD-MM-YYYY", "DD-MM-YY"]).format(),
+      updated_on: moment(new Date(Date.now()), ["DD-MM-YYYY", "DD-MM-YY"]).format(),
+    });
     return {
       success: true,
-      error: null,
+      error: {
+        message: null,
+        code: 200,
+      },
       data: null,
     };
   } catch (err) {
     return {
       success: false,
-      error: err,
+      error: {
+        message: (err as Error).message,
+        code: 500,
+      },
       data: null,
     };
   }
@@ -50,15 +62,18 @@ const getFromDb = async (id?: ObjectId) => {
     return {
       success: true,
       error: {
-        code: 200,
         message: null,
+        code: 200,
       },
       data: resp,
     };
   } catch (err) {
     return {
       success: false,
-      error: err,
+      error: {
+        message: (err as Error).message,
+        code: 500,
+      },
       data: null,
     };
   }
@@ -74,8 +89,8 @@ const deleteFromDb = async (id: ObjectId) => {
       return {
         success: true,
         error: {
-          code: 200,
           message: null,
+          code: 200,
         },
         data: resp?.deletedCount,
       };
@@ -100,8 +115,52 @@ const deleteFromDb = async (id: ObjectId) => {
   }
 };
 
+const updateFromDb = async (id: ObjectId, post: Post) => {
+  try {
+    const oldPost = (await getFromDb(id)).data as unknown as Post[];
+    if (oldPost.length == 0) {
+      return {
+        success: false,
+        error: {
+          message: "Post doesn't exist.",
+          code: 404,
+        },
+      };
+    }
+    const resp = await collections.posts?.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          title: post.title || oldPost[0].title,
+          content: post.content || oldPost[0].content,
+          author: post.author || oldPost[0].author,
+          updated_on: moment(Date.now()).format(),
+        },
+      }
+    );
+    return {
+      success: true,
+      error: {
+        message: null,
+        code: 200,
+      },
+      data: resp,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      error: {
+        code: 500,
+        message: (err as Error).message,
+      },
+      data: null,
+    };
+  }
+};
+
 export default {
-  pushToDb,
+  postToDb,
   getFromDb,
   deleteFromDb,
+  updateFromDb,
 };
